@@ -8,9 +8,8 @@
 // WiFi ID, pwd, port number.
 #include <WiFi.h>
 const char* ssid = "ATT37FMI4R";
-const char* pwd  = "3b%js3=6n6uk";
-//const char* ssid = "ATT8y2D8F9";
-//const char* pwd  = "5v4e794s8d8+";
+const char* pwd  = "password";
+
 WiFiServer server(80);  // port
 
 
