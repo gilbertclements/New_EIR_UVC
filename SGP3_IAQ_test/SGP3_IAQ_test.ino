@@ -1,29 +1,29 @@
-/*
-
-  SGP30 Datasheet: https://cdn.sparkfun.com/assets/c/0/a/2/e/Sensirion_Gas_Sensors_SGP30_Datasheet.pdf
-  https://www.sparkfun.com/products/14813
-  SGP30 IAQ Sensor   https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
-  https://github.com/sparkfun/SparkFun_SGP30_Arduino_Library/archive/master.zip
-
-*/
-
-#include "SparkFun_SGP30_Arduino_Library.h" // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
+/********************************************************************************************************
+  SparkFun SGP30          IAQ sensor
+  Order product:          https://www.sparkfun.com/products/16531
+  Hookup Guide:           https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
+  SGP30 Datasheet:        https://cdn.sparkfun.com/assets/c/0/a/2/e/Sensirion_Gas_Sensors_SGP30_Datasheet.pdf
+  Library:                https://github.com/sparkfun/SparkFun_SGP30_Arduino_Library/archive/master.zip
+  Program:                Test SGP30 IAQ Sensor prints TVOCs ppb and CO2 ppm
+********************************************************************************************************/
+///////////////////////initialize////////////////////////////
+#include "SparkFun_SGP30_Arduino_Library.h"                                   // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
 #include <Wire.h>
 
-SGP30 SGP30_Sensor; //create an object of the SGP30 class
+SGP30 SGP30_Sensor;                                                                  //create an object of the SGP30 
 
 void setup() {  ///////////////////////setup////////////////////////////
-  Serial.begin(115200);
+  Serial.begin(115200);                                                              // baud rate serial monitor
   Wire.begin();
   if (!SGP30_Sensor.begin()) {
     Serial.println("Unable to communicate with SGP30. Check Quiic connection.");
     while (1);
   }
   SGP30_Sensor.initAirQuality();
-  SGP30_Sensor.measureRawSignals();  //get raw values for H2 and Ethanol
+  SGP30_Sensor.measureRawSignals();                                                  //get raw values for H2 and Ethanol
   Serial.print("Raw H2: ");        Serial.print(SGP30_Sensor.H2);
   Serial.print("\tRaw Ethanol: "); Serial.println(SGP30_Sensor.ethanol);
-  SGP30_Sensor.measureAirQuality();  //measure CO2 and TVOC levels
+  SGP30_Sensor.measureAirQuality();                                                  //measure CO2 and TVOC levels
   Serial.print("CO2: ");           Serial.print(SGP30_Sensor.CO2);
   Serial.print(" ppm\tTVOC: ");    Serial.print(SGP30_Sensor.TVOC);Serial.println(" ppb");
  
