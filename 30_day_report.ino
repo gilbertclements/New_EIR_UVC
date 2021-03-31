@@ -1,39 +1,56 @@
-/*************************************************************************
-*
-*
-*************************************************************************/
+/******************************************************************************************************************************************
+  More at
+  ESP32              https://www.sparkfun.com/products/15663
+  SGP30 IAQ Sensor   https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
+  UV light Sensor    https://learn.sparkfun.com/tutorials/qwiic-uv-sensor-veml6075-hookup-guide
+  SPDT RELAY         https://learn.sparkfun.com/tutorials/qwiic-single-relay-hookup-guide
+  BME680 AQIndex     https://learn.sparkfun.com/tutorials/sparkfun-environmental-sensor-breakout---bme680-qwiic-hookup-guide
+  
+  File
+    Preferences
+      Additional Boards Manager URLs: 
+  https://dl.espressif.com/dl/package_esp32_index.json
+  
+ * Tools
+    Boards
+      ESP32 Arduino
+        "Adafruit ESP32 Feather"
+  Upload speed: "921600"
+  Flash Frequincy: "80MHz"
+  Partion Scheme: "Default"
+  Core Debug Level: "None"
+******************************************************************************************************************************************/
 #include <Wire.h>
-#include "time.h"
+#include "time.h"                                      // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
 // https://www.arduino.cc/en/Reference/EEPROM
 // Memory where data can be stored even when power is off.
-#include <EEPROM.h>
+#include <EEPROM.h>                                    // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
 // WiFi ID, pwd, port number.
-#include <WiFi.h>
+#include <WiFi.h>                                      // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 const char* ssid = "ATT37FMI4R";
 const char* pwd  = "password";
 
 WiFiServer server(80);  // port
 
-
 // Adafruit Unified Sensor (used for all Adafruit sensors)
-#include <Adafruit_Sensor.h>
+#include <Adafruit_Sensor.h>                                    // Click here to get the library: http://librarymanager/All#Adafruit_Sensor
 
 // Sensor of temperature, pressure, humidity.
-#include "Adafruit_BME680.h"
+#include "Adafruit_BME680.h"                                    // Click here to get the library: http://librarymanager/All#Adafruit_BME680
 
 // Turn on or off high voltage device (110V).
-#include "SparkFun_Qwiic_Relay.h"
+#include "SparkFun_Qwiic_Relay.h"                               // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
 
 // TVOC and CO2 sensors.
-#include "SparkFun_SGP30_Arduino_Library.h"
+#include "SparkFun_SGP30_Arduino_Library.h"                     // Click here to get the library: http://librarymanager/All#SparkFun_Qwiic_Relay
 
 // UV sensor.
-#include <SparkFun_VEML6075_Arduino_Library.h>
+#include <SparkFun_VEML6075_Arduino_Library.h>                  // Click here to get the library: http://librarymanager/All#SparkFun_VEML6075
 
 // Instantiate device objects.
-#define RELAY_ADDR 0x18
+#define RELAY_ADDR 0x18                                         // Alternate address 0x19
 Qwiic_Relay relay(RELAY_ADDR);
 
 Adafruit_BME680 bme;  // Pressure, Temperature, Humidity
@@ -76,7 +93,7 @@ float uvindexmin;
 void setup()
 {
     Wire.begin();
-    Serial.begin(115200);
+    Serial.begin(115200);                                                              // baud rate serial monitor
 
     // Initialize relay and sensors.
     if(!relay.begin()) Serial.println("Relay did not initialize.");
