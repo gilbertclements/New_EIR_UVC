@@ -19,6 +19,7 @@ Locker Rooms, Fitness and Athletic Centers
 Hotels, Dormitories and Offices  
 
 /////////////////////////////////////////////////////////INFO/////////////////////////////////////////////////////////
+
 30-day report New-EIR Germicidal UV-C and air quality monitoring
 Program measures UV output with VEML6075, collects air quality reading from SGP30 and BME680, uses i2c connection to ESP32 displays data on wedserver
 To set up ESP32 open IDE press "ctrl + comma" or File, Preferences, Additional Boards Manager URLs: enter the URL for json file
@@ -31,7 +32,9 @@ Replace ssid "network" and "password" with your oun WiFi network id and password
 const char* ssid = "network";
 const char* pwd  = "password";
 ESP32 will set up webserver and display "Local IP address" in serial monitor with baud rate "115200"
+
 /////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
+
  * File
     Preferences
       Additional Boards Manager URLs: 
