@@ -1,18 +1,19 @@
-/*  
-  SparkFun VEML6075 https://www.sparkfun.com/products/14748
-  Hookup tutorial    https://learn.sparkfun.com/tutorials/qwiic-uv-sensor-veml6075-hookup-guide
-  Include the SparkFun VEML6075 library.  https://github.com/sparkfun/SparkFun_VEML6075_Arduino_Library/archive/master.zip
-  Click here to get the library: http://librarymanager/All#SparkFun_VEML6075  
-
-*/
-
-#include <SparkFun_VEML6075_Arduino_Library.h> // Click here to get the library: http://librarymanager/All#SparkFun_VEML6075 
+/********************************************************************************************************
+  SparkFun VEML6075       UV sensor
+  Order product:          https://www.sparkfun.com/products/15089
+  Hookup Guide:           https://learn.sparkfun.com/tutorials/qwiic-uv-sensor-veml6075-hookup-guide
+  Datasheet:              https://cdn.sparkfun.com/assets/3/c/3/2/f/veml6075.pdf
+  Library:                https://github.com/sparkfun/SparkFun_VEML6075_Arduino_Library/archive/master.zip
+  Program:                Test read UVA, UVB, calculate UVindex
+********************************************************************************************************/
+///////////////////////initialize////////////////////////////
+#include <SparkFun_VEML6075_Arduino_Library.h>                          // Click here to get the library: http://librarymanager/All#SparkFun_VEML6075 
 #include <Wire.h>
 
-VEML6075 UV_Sensor; // Create a VEML6075 object
+VEML6075 UV_Sensor;                                                     // Create a VEML6075 object
 
 void setup(){ ///////////////////////setup////////////////////////////
-  Serial.begin(115200);                                             //Communicate with serial montor
+  Serial.begin(115200);                                                 // baud rate serial monitor
   Wire.begin();
   if (!UV_Sensor.begin()) {                                             // confirm communication on serial monitor
     Serial.println("Unable to communicate with VEML6075. Check Quiic connection.");
@@ -20,7 +21,7 @@ void setup(){ ///////////////////////setup////////////////////////////
   }
   Serial.print("Raw UVA: "); Serial.println(UV_Sensor.rawUva());
   Serial.print("Raw UVB: "); Serial.println(UV_Sensor.rawUvb());
-  Serial.print("Raw IR: ");  Serial.println(UV_Sensor.irCompensation());
+  Serial.print("Raw IR:  ");  Serial.println(UV_Sensor.irCompensation());
   Serial.print("UVA:\t");     Serial.println(UV_Sensor.a());
   Serial.print("UVB:\t");     Serial.println(UV_Sensor.b());
   Serial.print("UVIndex:\t"); Serial.println(UV_Sensor.index());
@@ -37,6 +38,10 @@ void setup(){ ///////////////////////setup////////////////////////////
 void loop(){ ///////////////////////loop////////////////////////////
   // Use the uva, uvb, and index functions to read calibrated UVA and UVB values and a
   // calculated UV index value between 0-11.
-  Serial.println(String(UV_Sensor.uva()) + ",\t" + String(UV_Sensor.uvb()) + ",\t" + String(UV_Sensor.index()));
+  Serial.print(UV_Sensor.uva());
+  Serial.print("\t");
+  Serial.print(UV_Sensor.uvb());
+  Serial.print("\t");
+  Serial.println(UV_Sensor.index());
   delay(1000*5);  //Wait 5 second
 }
