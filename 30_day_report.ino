@@ -23,9 +23,8 @@
 #include <Wire.h>
 #include "time.h"                                      // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
-// https://www.arduino.cc/en/Reference/EEPROM
 // Memory where data can be stored even when power is off.
-#include <EEPROM.h>                                    // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
+#include <EEPROM.h>                                    // https://www.arduino.cc/en/Reference/EEPROM
 
 // WiFi ID, pwd, port number.
 #include <WiFi.h>                                      // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
