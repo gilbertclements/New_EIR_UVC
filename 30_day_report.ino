@@ -1,12 +1,9 @@
 /******************************************************************************************************************************************
-  More at
-  ESP32              https://www.sparkfun.com/products/15663
-  SGP30 IAQ Sensor   https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
-  UV light Sensor    https://learn.sparkfun.com/tutorials/qwiic-uv-sensor-veml6075-hookup-guide
-  SPDT RELAY         https://learn.sparkfun.com/tutorials/qwiic-single-relay-hookup-guide
-  BME680 AQIndex     https://learn.sparkfun.com/tutorials/sparkfun-environmental-sensor-breakout---bme680-qwiic-hookup-guide
-  
-  File
+30-day report New-EIR Germicidal UV-C and air quality monitoring
+Program measures UV output with VEML6075, collects air quality reading from SGP30 and BME680, uses i2c connection to ESP32 displays data on wedserver
+ 
+/////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
+ * File
     Preferences
       Additional Boards Manager URLs: 
   https://dl.espressif.com/dl/package_esp32_index.json
@@ -19,8 +16,16 @@
   Flash Frequincy: "80MHz"
   Partion Scheme: "Default"
   Core Debug Level: "None"
+
+/////////////////////////////////////////////////////More info at/////////////////////////////////////////////////////
+  ESP32              https://www.sparkfun.com/products/15663
+  SGP30 IAQ Sensor   https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
+  UV light Sensor    https://learn.sparkfun.com/tutorials/qwiic-uv-sensor-veml6075-hookup-guide
+  SPDT RELAY         https://learn.sparkfun.com/tutorials/qwiic-single-relay-hookup-guide
+  BME680 AQIndex     https://learn.sparkfun.com/tutorials/sparkfun-environmental-sensor-breakout---bme680-qwiic-hookup-guide
+  
 ******************************************************************************************************************************************/
-#include <Wire.h>
+#include <Wire.h>                                      // This header file should already be installed on Arduino
 #include "time.h"                                      // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
 // Memory where data can be stored even when power is off.
