@@ -1,4 +1,6 @@
-/*Order product:          https://www.sparkfun.com/products/15663
+/*******************************************************************************************************
+  SparkFun   
+  Order product:          https://www.sparkfun.com/products/15663
   Hookup Guide:           https://learn.sparkfun.com/tutorials/esp32-thing-plus-hookup-guide
   ESP32-WROOM Datasheet:  https://cdn.sparkfun.com/assets/learn_tutorials/8/5/2/esp32-wroom-32_datasheet_en.pdf
   
@@ -20,13 +22,13 @@
   Flash Frequincy: "80MHz"
   Partion Scheme: "Default"
   Core Debug Level: "None"
-*/
+*******************************************************************************************************/
 ///////////////////////initialize////////////////////////////
 int ESP_BUTTON_PIN = 0;                                                               // pin number of the push button is 0 on ESP32
 int BUTTON_State = 0;                                                                 // variable for reading the pushbutton status
 
 void setup() {///////////////////////setup////////////////////////////
-  Serial.begin(115200);
+  Serial.begin(115200);                                                               // baud rate serial monitor
   Serial.println(hallRead());                                                         // Magnetic field sensed by Hall sensor
 
   pinMode(LED_BUILTIN, OUTPUT);                                                       // initialize the LED pin as an output, LED pin 13 on ESP32:
