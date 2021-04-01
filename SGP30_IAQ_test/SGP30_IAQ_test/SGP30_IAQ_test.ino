@@ -1,12 +1,11 @@
-/*
-
-  SGP30 Datasheet: https://cdn.sparkfun.com/assets/c/0/a/2/e/Sensirion_Gas_Sensors_SGP30_Datasheet.pdf
-  https://www.sparkfun.com/products/14813
-  SGP30 IAQ Sensor   https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
-  https://github.com/sparkfun/SparkFun_SGP30_Arduino_Library/archive/master.zip
-
-*/
-
+/********************************************************************************************************
+  SparkFun VEML6075       UV sensor
+  Order product:          https://www.sparkfun.com/products/14813
+  Hookup Guide:           https://learn.sparkfun.com/tutorials/sparkfun-air-quality-sensor---sgp30-qwiic-hookup-guide
+  SGP30 Datasheet:        https://cdn.sparkfun.com/assets/c/0/a/2/e/Sensirion_Gas_Sensors_SGP30_Datasheet.pdf
+  Library:                https://github.com/sparkfun/SparkFun_SGP30_Arduino_Library/archive/master.zip
+  Program:                Measures CO2(ppm) and TVOCs(ppb) display in Serial monitor baud rate (115200)
+********************************************************************************************************/
 #include "SparkFun_SGP30_Arduino_Library.h" // Click here to get the library: http://librarymanager/All#SparkFun_SGP30
 #include <Wire.h>
 
