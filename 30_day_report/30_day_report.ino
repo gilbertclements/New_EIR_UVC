@@ -35,9 +35,7 @@ Replace wifi password!
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 #include <WiFi.h>                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
-const char* pwd  = "3b%js3=6n6uk";                              // Replace wifi password!
-//const char* ssid = "ATT8y2D8F9";                              // 
-//const char* pwd  = "5v4e794s8d8+";                            // 
+const char* pwd  = "password";                                  // Replace wifi password!
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 
