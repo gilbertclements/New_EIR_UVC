@@ -13,7 +13,8 @@
     Preferences
       Additional Boards Manager URLs: 
   https://dl.espressif.com/dl/package_esp32_index.json
-  
+  click here to install-> http://boardsmanager/All#ESP32 by Espressif Systems
+
  * Tools
     Boards
       ESP32 Arduino
@@ -23,12 +24,14 @@
   Partion Scheme: "Default"
   Core Debug Level: "None"
 *******************************************************************************************************/
-///////////////////////initialize////////////////////////////
-#include <WiFi.h>                                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF"
-const char* ssid = "ATT37FMI4R";
-const char* password  = "3b%js3=6n6uk";
+#include <WiFi.h>                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
+#include "time.h"                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
-WiFiServer server(80);
+/////////////////// WiFi ID, pwd, port number. ///////////////////
+const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
+const char* pwd  = "password";                                  // Replace wifi password!
+WiFiServer server(80);  // port                                 // 
+/////////////////// WiFi ID, pwd, port number. ///////////////////
 
 int ESP_BUTTON_PIN = 0;                                                               // pin number of the push button is 0 on ESP32
 int BUTTON_State = 0;                                                                 // variable for reading the pushbutton status
@@ -71,7 +74,6 @@ void loop() {////////////////////////loop///////////////////////////
         char c = client.read();                                              // then read a byte, then
         Serial.write(c);                                                     // print it out the serial monitor
         if (c == '\n') {                                                     // if the byte is a newline character
-
           if (currentLine.length() == 0) {                                 // if the current line is blank, you got two newline characters in a row.
             client.println("HTTP/1.1 200 OK");                             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK) and a content-type so the client knows what's coming, then a blank line:
             client.println("Content-type:text/html\n");
