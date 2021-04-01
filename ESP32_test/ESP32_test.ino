@@ -11,10 +11,11 @@
   Setup instructions
   File
     Preferences
-      Additional Boards Manager URLs: 
+      Additional Boards Manager URLs:   (ctrl + comma)
   https://dl.espressif.com/dl/package_esp32_index.json
-  
- * Tools
+  click here to install-> http://boardsmanager/All#ESP32 by Espressif Systems
+
+* Tools
     Boards
       ESP32 Arduino
         "Adafruit ESP32 Feather"
@@ -23,12 +24,12 @@
   Partion Scheme: "Default"
   Core Debug Level: "None"
 *******************************************************************************************************/
-///////////////////////initialize////////////////////////////
-#include <WiFi.h>                                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF"
-const char* ssid = "ATT37FMI4R";
-const char* password  = "3b%js3=6n6uk";
-
-WiFiServer server(80);
+//////////////////////// ! WiFi ID, pwd, port number ! ////////////////////////
+#include <WiFi.h>                                                            // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
+const char* ssid = "ATT37FMI4R";                                             // Replace wifi network id!
+const char* pwd  = "3b%js3=6n6uk";                                           // Replace wifi password!
+WiFiServer server(80);  // port                                              // 
+//////////////////////// ! WiFi ID, pwd, port number ! ////////////////////////
 
 int ESP_BUTTON_PIN = 0;                                                               // pin number of the push button is 0 on ESP32
 int BUTTON_State = 0;                                                                 // variable for reading the pushbutton status
