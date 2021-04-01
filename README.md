@@ -39,7 +39,8 @@ ESP32 will set up webserver and display "Local IP address" in serial monitor wit
     Preferences
       Additional Boards Manager URLs: 
   https://dl.espressif.com/dl/package_esp32_index.json
-  
+  click here to install-> http://boardsmanager/All#ESP32 by Espressif Systems
+
  * Tools
     Boards
       ESP32 Arduino
