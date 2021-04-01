@@ -30,8 +30,8 @@ Press "alt + T" or go to Tools, Port: select the Serial ports COM used by "Silic
 Install all Libraries to header files where is says "// Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF"
 Replace ssid "network" and "password" with your oun WiFi network id and password.
 
-*const char* ssid = "network";
-*const char* pwd  = "password";
+* const char* ssid = "network";
+* const char* pwd  = "password";
 
 ESP32 will set up webserver and display "Local IP address" in serial monitor with baud rate "115200"
 
