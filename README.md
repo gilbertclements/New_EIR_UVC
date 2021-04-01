@@ -29,24 +29,26 @@ Right click on "Start menu" to open "Device Manager" expaned "Ports(COM and LPT)
 Press "alt + T" or go to Tools, Port: select the Serial ports COM used by "Silicon Labs CP210x USB to UART Bridge" (e.i. COM5)
 Install all Libraries to header files where is says "// Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF"
 Replace ssid "network" and "password" with your oun WiFi network id and password.
-const char* ssid = "network";
-const char* pwd  = "password";
+
+*const char* ssid = "network";
+*const char* pwd  = "password";
+
 ESP32 will set up webserver and display "Local IP address" in serial monitor with baud rate "115200"
 
 /////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
 
  * File
-    Preferences
-      Additional Boards Manager URLs: 
-  https://dl.espressif.com/dl/package_esp32_index.json
-  click here to install-> http://boardsmanager/All#ESP32 by Espressif Systems
+ *   Preferences
+ *     Additional Boards Manager URLs: 
+ * https://dl.espressif.com/dl/package_esp32_index.json
+ * click here to install-> http://boardsmanager/All#ESP32 by Espressif Systems
 
  * Tools
-    Boards
-      ESP32 Arduino
-        "Adafruit ESP32 Feather"
-  Upload speed: "921600"
-  Flash Frequincy: "80MHz"
-  Partion Scheme: "Default"
-  Core Debug Level: "None"
+ *   Boards
+ *     ESP32 Arduino
+ *       "Adafruit ESP32 Feather"
+ * Upload speed: "921600"
+ * Flash Frequincy: "80MHz"
+ * Partion Scheme: "Default"
+ * Core Debug Level: "None"
 
