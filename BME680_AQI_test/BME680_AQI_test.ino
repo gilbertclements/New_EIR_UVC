@@ -1,5 +1,5 @@
 /********************************************************************************************************
-  SparkFun SGP30          Outdoor AQI sensor
+  SparkFun BME680         Outdoor AQI sensor
   Order product:          https://www.sparkfun.com/products/16466 
   Hookup Guide:           https://learn.sparkfun.com/tutorials/sparkfun-environmental-sensor-breakout---bme680-qwiic-hookup-guide?_ga=2.200546990.1835296421.1617144529-249622734.1608670751
   BME680 Datasheet:       https://cdn.sparkfun.com/assets/8/a/1/c/f/BME680-Datasheet.pdf
