@@ -4,6 +4,7 @@ Program measures UV output with VEML6075, collects air quality reading from SGP3
 Replace wifi network id!
 Replace wifi password!
 /////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
+Dowload IDE @ https://www.arduino.cc/en/software
  * File   (alt + F)
     Preferences
       Additional Boards Manager URLs:   (ctrl + comma)
