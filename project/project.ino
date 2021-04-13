@@ -646,7 +646,7 @@ void loop()
                                     bme.temperature, press, bme.humidity,
                                     tvoc_co2.TVOC, tvoc_co2.CO2, AQI, uva, uvb, uvindex,
                                     relay_state, bulbhours, bulbminutes,
-                                    relON, relOFF, relAUTO, refbutton);
+                                    relON, relOFF, relAUTO, relay_control, refbutton);
 
         client.println(message);
 
