@@ -34,10 +34,10 @@ Replace wifi password!
 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 #include <WiFi.h>                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
-//const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
-//const char* pwd  = "3b%js3=6n6uk";                              // Replace wifi password!
-const char* ssid = "ATT8y2D8F9";                              // 
-const char* pwd  = "5v4e794s8d8+";                            // 
+const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
+const char* pwd  = "3b%js3=6n6uk";                              // Replace wifi password!
+//const char* ssid = "ATT8y2D8F9";                              // 
+//const char* pwd  = "5v4e794s8d8+";                            // 
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 
@@ -68,9 +68,9 @@ VEML6075 uv;
 
 // Control and operating variables.
 unsigned long timeout = 2000;  // assume WiFi client message is done if no more characters come in this number of milliseconds
-int  client_refresh   =    3;  // seconds between refresh of client (minimum=3)
+int  client_refresh   =    5;  // seconds between refresh of client (minimum=3)
 int  header_interval  =   20;  // header rewritten to serial output after this many lines
-int  serial_interval  =    3;  // seconds between serial output of sensor values  (minimum=2)
+int  serial_interval  =    5;  // seconds between serial output of sensor values  (minimum=2)
 uint16_t relay_on_tvoc  = 40;  // relay on AUTO turns on  if TVOC is above this value
 uint16_t relay_off_tvoc = 30;  // relay on AUTO turns off if TVOC is below this value
 
@@ -570,14 +570,11 @@ void loop()
                             "html {font-family: Arial; display: inline-block; text-align: center;}"
                             "p {  font-size: 1.2rem;}"
                             "body {  margin: 0;}"
-                            ".topnav { overflow: hidden; background-color: #8800FF; color: white; font-size: 1.7rem; }"
+                            ".topnav { overflow: hidden; background-color: #440088; color: white; font-size: 1.7rem; }"
                             ".content { padding: 20px; }"
-                            ".card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }"
+                            ".card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(180,140,255,.5); }"
                             ".cards { max-width: 700px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }"
                             ".reading { font-size: 2.8rem; }"
-                            ".card.relay { color: #0044ff; }"
-                            ".card.TVOC { color: #17bebb; }"
-                            ".card.CO2 { color: #4B1D3F; }"
                             ".card.temperature { color: #0e7c7b; }"
                             ".card.humidity { color: #17bebb; }"
                             ".card.pressure { color: #4B1D3F; }"
@@ -592,17 +589,39 @@ void loop()
                          "</div>"
                          "<div class=\"content\">"
                          "<div class=\"cards\">"
-                         "<div class=\"card relay\">"
+                         "<div class=\"card temperature\">"
+                           "<h1>30-DAY Report<br>Welcome to:</h1>"
+                           "<h2>Stinger's Cafe</h2>"
+                           "<h3>6000 J St. Sacramento, CA <br> 95819-6055</h3>"
+                           "<h4>This Business has air sanitized and monitored by <br> 'New-EIR Germicidal UV-C' <br> for the safety, health and comfort of your customers. Ozone Free!</h4>"
+                           "<p style=\"font-size:10px\">Scan this QRcode to goto our webpage: <i class=\"fas fa-external-link-alt\"></i></p> <address><a href=\"https://sites.google.com/view/new-eiriaq\">sites.google.com/view/new-eiriaq</a></address><br>"
+                           "<img src=\"https://docs.google.com/drawings/d/e/2PACX-1vTa5l5IPNuLwZHn7b-yIDdKVXMi40wL0mT7YrQBGJmv7PBa23s-kqaKXxT_WkLeiL65R8BQA4RPw0kq/pub?w=240&amp;h=295\"><br>"
+                           "<p style=\"font-size:10px\">Keep this report on display for your customers' assurance of safety, health and comfort. Replace every week.</p><br>"
+                         "</div>"
+                         "<div class=\"card pressure\">"
+                           "<h1>Readings</h1>"
                          "<p>"
-                             "<i class=\"fas fa-calendar\"></i> %s  %s<br>"
+                             "<i class=\"fas fa-calendar-day\"></i> %s  %s<br>"
                              "<i class=\"fas fa-thermometer-half\"></i> Temperature (&deg;C) = %7.2f<br>"
                              "<i class=\"fas fa-tachometer-alt\"></i> Pressure (kPa) = %7.2f<br>"
                              "<i class=\"fas fa-tint\"></i> Humidity (&percnt;)      = %7.1f<br>"
-                             "<i class=\"fas fa-skull\"></i> TVOC (ppb) = %d<br>"
+                             "<i class=\"fas fa-poop\"></i> TVOCs (ppb) = %d<br>"
                              "<i class=\"fas fa-dizzy\"></i> CO2 (ppm)  = %d<br>"
-                             "<i class=\"fas fa-globe\"></i> AQI        = %7.0f<br>"
-                             "<i class=\"fas fa-sun\"></i> UVa          = %7.1f<br>"
-                             "<i class=\"fas fa-sun\"></i> UVb          = %7.1f<br>"
+                             "<i class=\"fas fa-air-freshener\"></i> AQI        = %7.0f<br>"
+                         "</p>"
+                             "<iframe width=\"300\" height=\"260\" seamless frameborder=\"0\" scrolling=\"no\" src=\"https://docs.google.com/spreadsheets/d/e/2PACX-1vR9FhxYm7vf5wwHYgRqjywVEX_XNbWSjp_XNNh6TO3L29nXAS0WXhmC-SytIRtHyu1uat2mJoaybN9d/pubchart?oid=2126194809&amp;format=interactive\"></iframe>"
+                             "<iframe width=\"300\" height=\"260\" seamless frameborder=\"0\" scrolling=\"no\" src=\"https://docs.google.com/spreadsheets/d/e/2PACX-1vR9FhxYm7vf5wwHYgRqjywVEX_XNbWSjp_XNNh6TO3L29nXAS0WXhmC-SytIRtHyu1uat2mJoaybN9d/pubchart?oid=350343&amp;format=interactive\"></iframe>"
+                         "</div>"
+                         "</div>"
+                         "<br><br>"
+                         "<div>"
+                         "<button style=\"background-color: #8844ff;\" onclick=\"window.print()\">Print 30-Day Report</button><br><br>"
+                         "</div>"
+                         "<br>"
+                         "<div style=\"color: #17bebb;\">"
+                         "</p>"
+                             "<i class=\"fas fa-sun\"></i> UVa (&micro;W/&#13216;) = %7.1f<br>"
+                             "<i class=\"fas fa-sun\"></i> UVb (&micro;W/&#13216;) = %7.1f<br>"
                              "<i class=\"fas fa-sun\"></i> UVindex      = %7.1f<br>"
                              "<i class=\"fas fa-toggle-on\"></i> Relay  = %s<br>"
                              "<i class=\"far fa-lightbulb\"></i> bulb on: %d hours %d minutes<br>"
@@ -616,38 +635,9 @@ void loop()
                              "</select>"
                          "</form>"
                          "<br>"
-                         "<form>"
-                             "<label for=\"client_refresh\"><i class=\"fas fa-clock\"></i> Seconds between WiFi refresh:</label>"
-                             "<input type=\"text\" id=\"client_refresh\" name=\"client_refresh\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                             "<label for=\"serial_interval\"><i class=\"fas fa-hourglass-half\"></i> Seconds between serial output:</label>"
-                             "<input type=\"text\" id=\"serial_interval\" name=\"serial_interval\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                             "<label for=\"header_interval\"><i class=\"fas fa-list\"></i> Lines between serial output headers:</label>"
-                             "<input type=\"text\" id=\"header_interval\" name=\"header_interval\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                             "<label for=\"store_dump\"><i class=\"fas fa-download\"></i> \"go\" to dump %d stored readings:</label>"
-                             "<input type=\"text\" id=\"store_dump\" name=\"store_dump\" size=\"3\" value=\"\">"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                             "<label for=\"zero_bulb\"><i class=\"fas fa-question\"></i> Password to zero bulb time:</label>"
-                             "<input type=\"text\" id=\"zero_bulb\" name=\"zero_bulb\" size=\"4\" value=\"\">"
-                         "</form>"
-                         "<br>"
                          "%s"
                          "%s"
                          "<br>"
-                         "<div>"
-                         "<label for=\"header_interval\"><i class=\"fas fa-external-link-alt\"></i> Scan this QRcode to goto our webpage: https://sites.google.com/view/new-eiriaq </label><br>"
-                         "<a rel='nofollow' href='https://www.qr-code-generator.com' border='0' style='cursor:default'><img src='https://chart.googleapis.com/chart?cht=qr&chl=https%%3A%%2F%%2Fsites.google.com%%2Fview%%2Fnew-eiriaq&chs=180x180&choe=UTF-8&chld=L|2' alt=''></a>"
-                         "</div>"
                          "</div>"
                          "</div>"
                          "</div>"
@@ -656,9 +646,7 @@ void loop()
                                     bme.temperature, press, bme.humidity,
                                     tvoc_co2.TVOC, tvoc_co2.CO2, AQI, uva, uvb, uvindex,
                                     relay_state, bulbhours, bulbminutes,
-                                    relON, relOFF, relAUTO,
-                                    client_refresh, serial_interval, header_interval,
-                                    nstored, relay_control, refbutton);
+                                    relON, relOFF, relAUTO, refbutton);
 
         client.println(message);
 
