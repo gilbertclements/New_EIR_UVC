@@ -28,7 +28,10 @@ Right click on "Start menu" to open "Device Manager" expaned "Ports(COM and LPT)
 Press "alt + T" or go to Tools, Port: select the Serial ports COM used by "Silicon Labs CP210x USB to UART Bridge" (e.i. COM5)
 Install all Libraries to header files where is says "// Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF"
 
-Dowload IDE @ https://www.arduino.cc/en/software
+Download ESP32 Driver
+https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip
+Dowload IDE APP
+https://www.microsoft.com/store/apps/9nblggh4rsd8?ocid=badge
 
 /////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
 * File
