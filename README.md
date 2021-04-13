@@ -18,8 +18,10 @@ Schools, Churches,  Theaters and Community Centers
 Locker Rooms, Fitness and Athletic Centers 
 Hotels, Dormitories and Offices  
 
-Download IDE
-https://www.arduino.cc/en/software
+Download ESP32 Driver
+https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip
+Dowload IDE APP
+https://www.microsoft.com/store/apps/9nblggh4rsd8?ocid=badge
 
 /////////////////////////////////////////////////////////INFO/////////////////////////////////////////////////////////
 
