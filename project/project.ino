@@ -624,7 +624,7 @@ void loop()
                              "<i class=\"fas fa-sun\"></i> UVb (&micro;W/&#13216;) = %7.1f<br>"
                              "<i class=\"fas fa-sun\"></i> UVindex      = %7.1f<br>"
                              "<i class=\"fas fa-toggle-on\"></i> Relay  = %s<br>"
-                             "<i class=\"far fa-lightbulb\"></i> bulb on: %d hours %d minutes<br>"
+                             "<i class=\"far fa-lightbulb\"></i> bulb on: %d hours<br>"
                          "</p>"
                          "<form>"
                              "<label for=\"relay\"><i class=\"fas fa-toggle-on\"></i> Relay:  </label>"
@@ -635,9 +635,6 @@ void loop()
                              "</select>"
                          "</form>"
                          "<br>"
-                         "%s"
-                         "%s"
-                         "<br>"
                          "</div>"
                          "</div>"
                          "</div>"
@@ -645,8 +642,8 @@ void loop()
                          "</html>", client_refresh, localIP, datenow, timenow,
                                     bme.temperature, press, bme.humidity,
                                     tvoc_co2.TVOC, tvoc_co2.CO2, AQI, uva, uvb, uvindex,
-                                    relay_state, bulbhours, bulbminutes,
-                                    relON, relOFF, relAUTO, relay_control, refbutton);
+                                    relay_state, bulbhours,
+                                    relON, relOFF, relAUTO, refbutton);
 
         client.println(message);
 
