@@ -18,6 +18,9 @@ Schools, Churches,  Theaters and Community Centers
 Locker Rooms, Fitness and Athletic Centers 
 Hotels, Dormitories and Offices  
 
+Download IDE
+https://www.arduino.cc/en/software
+
 /////////////////////////////////////////////////////////INFO/////////////////////////////////////////////////////////
 
 30-day report New-EIR Germicidal UV-C and air quality monitoring
