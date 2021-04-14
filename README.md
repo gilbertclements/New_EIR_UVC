@@ -18,20 +18,24 @@ Schools, Churches,  Theaters and Community Centers
 Locker Rooms, Fitness and Athletic Centers 
 Hotels, Dormitories and Offices  
 
+
+/////////////////////////////////////////////////////////Program INFO/////////////////////////////////////////////////////////
+
+30-day report New-EIR Germicidal UV-C and air quality monitoring
+Program measures UV output with VEML6075, collects air quality reading from SGP30 and BME680, uses i2c connection to ESP32 displays data on wedserver
+
+First to set up ESP32 
+
 Download ESP32 Driver
 https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip
-https://cdn.sparkfun.com/assets/learn_tutorials/8/4/4/CH341SER.EXE
-http://www.wch-ic.com/downloads/CH341SER_ZIP.html
+https://www.silabs.com/documents/public/software/CP210x_Windows_Drivers.zip
+
 https://cdn.sparkfun.com/assets/learn_tutorials/8/4/4/CH341SER.EXE
 
 Dowload IDE APP
 https://www.microsoft.com/store/apps/9nblggh4rsd8?ocid=badge
 
-/////////////////////////////////////////////////////////INFO/////////////////////////////////////////////////////////
-
-30-day report New-EIR Germicidal UV-C and air quality monitoring
-Program measures UV output with VEML6075, collects air quality reading from SGP30 and BME680, uses i2c connection to ESP32 displays data on wedserver
-To set up ESP32 open IDE press "ctrl + comma" or File, Preferences, Additional Boards Manager URLs: enter the URL for json file
+Now open IDE press "ctrl + comma" or File, Preferences, Additional Boards Manager URLs: enter the URL for json file
   URL for json file:  https://dl.espressif.com/dl/package_esp32_index.json
 Press "alt + T" or go to Tools, Boards, Boards Manager install ESP32 by Espressif Systems. Then go to Tools, Boards, ESP32 Arduino, "Adafruit ESP32 Feather"
 Right click on "Start menu" to open "Device Manager" expaned "Ports(COM and LPT)" find which COM is used by "Silicon Labs CP210x USB to UART Bridge"
