@@ -167,6 +167,13 @@ void setup()
     Serial.print("Local IP address:  ");
     Serial.println(WiFi.localIP());
     server.begin();
+    
+  pinMode(LED_BUILTIN, OUTPUT);                                                       // initialize the LED pin as an output, LED pin 13 on ESP32:
+  for (byte count = 0; count < 5; count++) {                                          // short strobe confirm i2c communication
+    digitalWrite(LED_BUILTIN, HIGH);                                                  // turn the LED on (HIGH is the voltage level)
+    delay(50);                                                                        // wait for a few msec
+    digitalWrite(LED_BUILTIN, LOW);                                                   // turn the LED off by making the voltage LOW
+    delay(50); }                                                                      // wait for a few msec
 }
 
 void loop()
@@ -268,6 +275,10 @@ void loop()
     // Write header for sensor readings.
     if(iheader >= header_interval)
     {
+        digitalWrite(LED_BUILTIN, HIGH);                                                  // turn the LED on (HIGH is the voltage level)
+        delay(50);                                                                        // wait for a few msec
+        digitalWrite(LED_BUILTIN, LOW);                                                   // turn the LED off by making the voltage LOW
+        
         sprintf(message, "%s   C     kPa      %%      ppb     ppm     hrs\n"
                          " %s   Temp  Press    Hum    TVOC     CO2    Bulb   AQI     UVa     UVb   UVidx  Relay\n", monthday, thisyear);
         Serial.print(message);
