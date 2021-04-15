@@ -1,10 +1,15 @@
 /******************************************************************************************************************************************
 30-day report New-EIR Germicidal UV-C and air quality monitoring
 Program measures UV output with VEML6075, collects air quality reading from SGP30 and BME680, uses i2c connection to ESP32 displays data on wedserver
+
+Download ESP32 Driver
+https://www.silabs.com/documents/public/software/CP210x_Universal_Windows_Driver.zip
+Dowload IDE APP
+https://www.microsoft.com/store/apps/9nblggh4rsd8?ocid=badge
+
 Replace wifi network id!
 Replace wifi password!
 /////////////////////////////////////////////////////Confirgure IDE/////////////////////////////////////////////////////
-Dowload IDE @ https://www.arduino.cc/en/software
  * File   (alt + F)
     Preferences
       Additional Boards Manager URLs:   (ctrl + comma)
@@ -29,14 +34,21 @@ Dowload IDE @ https://www.arduino.cc/en/software
 ******************************************************************************************************************************************/
 #include <Wire.h>                                               // This header file should already be installed on Arduino
 #include "time.h"                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
+#include "SparkFun_VEML6030_Ambient_Light_Sensor.h"
+#define AL_ADDR 0x48
+SparkFun_Ambient_Light light(AL_ADDR);
+float gain = .125;
+long luxVal = 0; 
 
 // Memory where data can be stored even when power is off.
 #include <EEPROM.h>                                             // https://www.arduino.cc/en/Reference/EEPROM
 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 #include <WiFi.h>                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
-const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
-const char* pwd  = "password";                                  // Replace wifi password!
+const char* ssid = "Alola";                                // Replace wifi network id!
+const char* pwd  = "0palossand";                              // Replace wifi password!
+//const char* ssid = "AndroidAP";
+//const char* pwd  = "iaqcsus193";
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 
@@ -65,13 +77,14 @@ SGP30 tvoc_co2;
 
 VEML6075 uv;
 
-// Control and operating variables.
-unsigned long timeout = 2000;  // assume WiFi client message is done if no more characters come in this number of milliseconds
-int  client_refresh   =    4;  // seconds between refresh of client (minimum=3)
-int  header_interval  =   20;  // header rewritten to serial output after this many lines
-int  serial_interval  =    4;  // seconds between serial output of sensor values  (minimum=2)
-uint16_t relay_on_tvoc  = 40;  // relay on AUTO turns on  if TVOC is above this value
-uint16_t relay_off_tvoc = 30;  // relay on AUTO turns off if TVOC is below this value
+/////////////// Control and operating variables. /////////////// 
+unsigned long timeout   = 2*1000;                             // assume WiFi client message is done if no more characters come in this number of milliseconds
+int  client_refresh     = 5;                                  // seconds between refresh of client (minimum=3)
+int  header_interval    = 20;                                 // header rewritten to serial output after this many lines
+int  serial_interval    = 5;                                  // seconds between serial output of sensor values  (minimum=2)
+uint16_t relay_on_tvoc  = 500;                                // relay on AUTO turns on  if TVOC is above this value
+uint16_t relay_off_tvoc = 300;                                // relay on AUTO turns off if TVOC is below this value
+/////////////// Control and operating variables. /////////////// 
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = (-8) * 3600;  // Pacific is 8 hours behind GMT
@@ -87,20 +100,35 @@ char refMANUAL[12];
 char refAUTO[12];
 char meta_refresh[48];
 char relay_state[8];
+char localIP[16];
 unsigned long currentTime, lastChrTime, msecNow, msecInc;
 unsigned long nextSerialTime = 0;
 unsigned long msecPrev = 0;
 char month[12][4];
-union { uint32_t store32; char storec[4]; } store32c;
-uint32_t lightsec = 0;  // time (sec) light intensity has been above minimum
-float uvindexmin;
+union { uint32_t store32i; float store32f; char store32c[4]; } store32ifc;
+uint32_t bulbsectot = 0;  // time (sec) bulb intensity (UV index) has been above minimum
+float uvindexmax = 0;
+float uvindexmin = 0;
 
+// Variables used to store historical data in memory.
+#define  MAXSTORE 3072
+int      istore  = 0;
+int      nstored = 0;
+uint16_t z_year[MAXSTORE];
+uint8_t  z_month[MAXSTORE], z_mday[MAXSTORE], z_hour[MAXSTORE], z_minute[MAXSTORE], z_second[MAXSTORE];
+float    z_temp[MAXSTORE], z_AQI[MAXSTORE],   z_AQU[MAXSTORE],  z_uvindex[MAXSTORE];
+uint16_t z_TVOC[MAXSTORE], z_CO2[MAXSTORE];
 
-void setup()
-{
+void setup(){
+    char chrini, chrfin;
     Wire.begin();
-    Serial.begin(115200);
+    Serial.begin(115200);  // Baud rate for serial output.
 
+  if(!light.begin()){ //Ambient light sensor for solar panel
+    Serial.println("Could not communicate with the sensor!");
+    } else {
+    Serial.print("Ambeint Light sensor VEML6030 is reading "); Serial.print(light.readLight()); Serial.print(" LUX\n"); }
+    
     // Initialize relay and sensors.
     if(!relay.begin()) Serial.println("Relay did not initialize.");
     else               Serial.println("Relay initialized.");
@@ -115,7 +143,7 @@ void setup()
     bme.setHumidityOversampling(BME680_OS_2X);
     bme.setPressureOversampling(BME680_OS_4X);
     bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
-    bme.setGasHeater(320, 150); // 320*C for 150 ms
+    bme.setGasHeater(320, 150);  // 320*C for 150 ms
 
     if(!tvoc_co2.begin()) Serial.println("SGP30 did not initialize.");
     else                  Serial.println("SGP30 initialized.");
@@ -146,26 +174,38 @@ void setup()
     strcpy(month[6], "JUL"); strcpy(month[ 7], "AUG"); strcpy(month[ 8], "SEP");
     strcpy(month[9], "OCT"); strcpy(month[10], "NOV"); strcpy(month[11], "DEC");
 
-    // Initialize light time using value stored in EEPROM if it exists.
-    char chr0 = EEPROM.read(0);
-    char chr5 = EEPROM.read(5);
-    if(chr0 == ':'  &&  chr5 == ';')
+    // Initialize bulb time using value stored in EEPROM if it exists.
+    chrini = EEPROM.read(0);
+    chrfin = EEPROM.read(5);
+    if(chrini == ':'  &&  chrfin == ';')
     {
-        store32c.storec[0] = EEPROM.read(1);
-        store32c.storec[1] = EEPROM.read(2);
-        store32c.storec[2] = EEPROM.read(3);
-        store32c.storec[3] = EEPROM.read(4);
-        lightsec = store32c.store32;
+        store32ifc.store32c[0] = EEPROM.read(1);
+        store32ifc.store32c[1] = EEPROM.read(2);
+        store32ifc.store32c[2] = EEPROM.read(3);
+        store32ifc.store32c[3] = EEPROM.read(4);
+        bulbsectot = store32ifc.store32i;
     }
 
-    // Calculate uvindex minimum based on bulb wattage.
-    uvindexmin = 3;  // This needs to be updated.
+    // Initialize UV index maximum (for determining when bulb should be changed).
+    chrini = EEPROM.read(8);
+    chrfin = EEPROM.read(13);
+    if(chrini == ':'  &&  chrfin == ';')
+    {
+        store32ifc.store32c[0] = EEPROM.read( 9);
+        store32ifc.store32c[1] = EEPROM.read(10);
+        store32ifc.store32c[2] = EEPROM.read(11);
+        store32ifc.store32c[3] = EEPROM.read(12);
+        uvindexmax = store32ifc.store32f;
+        uvindexmin = 0.5f * uvindexmax;
+    }
+    uvindexmin = 0.015625;  // 1/2^6  This needs to be updated.
 
     // Print local IP address and start web server
     Serial.println("");
     Serial.println("WiFi connected.");
+    strcpy(localIP, WiFi.localIP().toString().c_str());
     Serial.print("Local IP address:  ");
-    Serial.println(WiFi.localIP());
+    Serial.println(localIP);
     server.begin();
     
   pinMode(LED_BUILTIN, OUTPUT);                                                       // initialize the LED pin as an output, LED pin 13 on ESP32:
@@ -178,8 +218,8 @@ void setup()
 
 void loop()
 {
-    int    i, isetrel, isetcli, isetser, isethed, isetzro, isetron, isetrof, len;
-    int    iyear, imonth, imday, ihour, iminute;
+    int    i, isetrel, isetcli, isetser, isethed, isetzro, isetron, isetrof, isetdmp, len;
+    int    iyear=0, imonth=0, imday=0, ihour=0, iminute=0, isecond=0;
     char   chr;
     char   refbutton[256], relay_control[512];
     char   temp[8], datenow[16], timenow[16], monthday[16], thisyear[16];
@@ -188,18 +228,20 @@ void loop()
     struct tm timeinfo;
     uint8_t relayStateNow  = 0;
     uint8_t relayStatePrev = 0;
-    uint32_t bulbdays, bulbhours, bulbminutes, bulbhourstot;
+    uint32_t bulbhours, bulbminutes;
+    WiFiClient client;
 
     // Get readings from sensors.
     bme.performReading();
     tvoc_co2.measureAirQuality();
     if(relay.getState() == 0) strcpy(relay_state, "OFF");
-    else                      strcpy(relay_state, "ON" );
+    else                      strcpy(relay_state, " ON" );
     press   = (double)bme.pressure;
     press  /= 1000.0;
     uva     = uv.a();
     uvb     = uv.b();
     uvindex = uv.index();
+    luxVal = light.readLight();
 
     // Calculate air quality index (AQI) from air resistance and humidity.
     // AQI:          0         500
@@ -223,35 +265,47 @@ void loop()
 
     AQI = (0.75 * resistanceAQI) + (0.25 * humidityAQI);
 
-    // If relay is on, increment and save time that light intensity is above minimum.
+    // Update maximum value of UV index if it has changed.
+    if(uvindex > uvindexmax)
+    {
+        uvindexmax = uvindex;
+        store32ifc.store32f = uvindexmax;
+        EEPROM.write( 8, ':');
+        EEPROM.write( 9, store32ifc.store32c[0]);
+        EEPROM.write(10, store32ifc.store32c[1]);
+        EEPROM.write(11, store32ifc.store32c[2]);
+        EEPROM.write(12, store32ifc.store32c[3]);
+        EEPROM.write(13, ';');
+        uvindexmin = 0.5f * uvindexmax;  // This value may need to be adjusted.
+    }
+
+    // If relay is on, increment and save the time that bulb intensity (UV index) is above minimum.
     relayStateNow = relay.getState();
     msecNow       = millis();
 
-    if(relayStateNow != 0)
+    if(relayStateNow != 0  &&  uvindex > 0.0)
     {
         if(relayStatePrev != 0)
         {
-            if(uvindex >= uvindexmin)
+            if(uvindex > uvindexmin)
             {
                 if(msecNow >= msecPrev) msecInc = msecNow - msecPrev;
-                else                    msecInc = msecNow + (0xffffffff - msecPrev);  // when millis overflows
-                lightsec += (msecInc / 1000);
-                store32c.store32 = lightsec;
+                else                    msecInc = msecNow + (0xFFFFFFFF - msecPrev);  // when millis overflows
+                bulbsectot += (msecInc / 1000);
+                store32ifc.store32i = bulbsectot;
                 EEPROM.write(0, ':');
-                EEPROM.write(1, store32c.storec[0]);
-                EEPROM.write(2, store32c.storec[1]);
-                EEPROM.write(3, store32c.storec[2]);
-                EEPROM.write(4, store32c.storec[3]);
+                EEPROM.write(1, store32ifc.store32c[0]);
+                EEPROM.write(2, store32ifc.store32c[1]);
+                EEPROM.write(3, store32ifc.store32c[2]);
+                EEPROM.write(4, store32ifc.store32c[3]);
                 EEPROM.write(5, ';');
             }
         }
     }
     relayStatePrev = relayStateNow;
     msecPrev       = msecNow;
-    bulbdays       = lightsec / 86400;
-    bulbhours      = (lightsec - (86400 * bulbdays)) / 3600;
-    bulbminutes    = (lightsec - (86400 * bulbdays) - (3600 * bulbhours)) / 60;
-    bulbhourstot   = lightsec /  3600;
+    bulbhours      = bulbsectot / 3600;
+    bulbminutes    = (bulbsectot - (3600 * bulbhours)) / 60;
 
     // Get date and time.
     if(getLocalTime(&timeinfo) != 0)
@@ -261,10 +315,11 @@ void loop()
         imday   = timeinfo.tm_mday;
         ihour   = timeinfo.tm_hour;
         iminute = timeinfo.tm_min;
+        isecond = timeinfo.tm_sec;
         sprintf(monthday, "%s %02d", month[imonth], imday);
         sprintf(thisyear, "%d", iyear);
         sprintf(datenow,  "%s %02d, %d", month[imonth], imday, iyear);
-        sprintf(timenow,  "%0d:%02d", ihour, iminute);
+        sprintf(timenow,  "%0d:%02d:%02d", ihour, iminute, isecond);
     }
     else
     {
@@ -275,12 +330,14 @@ void loop()
     // Write header for sensor readings.
     if(iheader >= header_interval)
     {
-        digitalWrite(LED_BUILTIN, HIGH);                                                  // turn the LED on (HIGH is the voltage level)
-        delay(50);                                                                        // wait for a few msec
-        digitalWrite(LED_BUILTIN, LOW);                                                   // turn the LED off by making the voltage LOW
-        
-        sprintf(message, "%s   C     kPa      %%      ppb     ppm     hrs\n"
-                         " %s   Temp  Press    Hum    TVOC     CO2    Bulb   AQI     UVa     UVb   UVidx  Relay\n", monthday, thisyear);
+      
+    digitalWrite(LED_BUILTIN, HIGH);                                                  // turn the LED on (HIGH is the voltage level)
+    delay(50);                                                                        // wait for a few msec
+    digitalWrite(LED_BUILTIN, LOW);                                                   // turn the LED off by making the voltage LOW
+    
+        sprintf(message, "%s      C     kPa      %%      ppb     ppm     hrs        \n"
+                         " %s      Temp  Press    Hum    TVOC     CO2    Bulb   AQI     UVa     UVb   UVidx  Relay     LUX\n",
+                         monthday, thisyear);
         Serial.print(message);
         iheader = 0;
     }
@@ -289,16 +346,37 @@ void loop()
     currentTime = millis();
     if(currentTime >= nextSerialTime)
     {
-        sprintf(message, "%s %6.1f %6.1f %6.1f %7d %7d %7d %5.0f %7.1f %7.1f %7.1f   %s\n",
+        sprintf(message, "%s %6.1f %6.1f %6.1f %7d %7d %7d %5.0f %7.1f %7.1f %7.1f    %s %7d\n",
                 timenow, bme.temperature, press, bme.humidity,
-                tvoc_co2.TVOC, tvoc_co2.CO2, bulbhourstot, AQI, uva, uvb, uvindex, relay_state);
+                tvoc_co2.TVOC, tvoc_co2.CO2, bulbhours, AQI, uva, uvb, uvindex, relay_state, luxVal);
+
         Serial.print(message);
         nextSerialTime = currentTime + (1000 * serial_interval);
         iheader++;
+
+        // Store sensor values in memory to send to serial output later.
+        z_year[istore]    = (uint16_t)iyear;
+        z_month[istore]   = (uint8_t)imonth;
+        z_mday[istore]    = (uint8_t)imday;
+        z_hour[istore]    = (uint8_t)ihour;
+        z_minute[istore]  = (uint8_t)iminute;
+        z_second[istore]  = (uint8_t)isecond;
+        z_temp[istore]    = (float)bme.temperature;
+        z_AQI[istore]     = (float)AQI;
+        z_uvindex[istore] = uvindex;
+        z_TVOC[istore]    = tvoc_co2.TVOC;
+        z_CO2[istore]     = tvoc_co2.CO2;
+        istore++;
+        if(istore >= MAXSTORE) istore = 0;
+        if(nstored < MAXSTORE) nstored++;
     }
 
     // Listen for incoming clients
-    WiFiClient client = server.available();
+    for(i=0; i<5; i++)
+    {
+        client = server.available();
+        if(client) break;
+    }
 
     // If a client is available and connected, read data coming from it.
     if(client)
@@ -321,7 +399,7 @@ void loop()
         }
         message[len] = '\0';
 
-        // Analyze message from client. Look for selections from dropdown menus.
+        // Analyze message from client. Look for user-specified data.
         isetrel = 0;
         isetcli = 0;
         isetser = 0;
@@ -329,6 +407,7 @@ void loop()
         isetzro = 0;
         isetron = 0;
         isetrof = 0;
+        isetdmp = 0;
 
         for(i=0; i<len; i++)
         {
@@ -395,13 +474,21 @@ void loop()
                     isetzro = 1;
                     if(message[i+11]=='Z' && message[i+13]=='R' && message[i+12]=='E' && message[i+14]=='O')
                     {
-                        EEPROM.write(0, ':');
-                        EEPROM.write(1, 0x00);
-                        EEPROM.write(2, 0x00);
-                        EEPROM.write(3, 0x00);
-                        EEPROM.write(4, 0x00);
-                        EEPROM.write(5, ';');
-                        lightsec = 0;
+                        EEPROM.write( 0, ':');
+                        EEPROM.write( 1, 0x00);
+                        EEPROM.write( 2, 0x00);
+                        EEPROM.write( 3, 0x00);
+                        EEPROM.write( 4, 0x00);
+                        EEPROM.write( 5, ';');
+                        EEPROM.write( 8, ':');
+                        EEPROM.write( 9, 0x00);
+                        EEPROM.write(10, 0x00);
+                        EEPROM.write(11, 0x00);
+                        EEPROM.write(12, 0x00);
+                        EEPROM.write(13, ';');
+                        bulbsectot = 0;
+                        uvindexmax = 0;
+                        uvindexmin = 0;
                     }
                 }
 
@@ -421,6 +508,32 @@ void loop()
                     temp[7] = '\0';
                     relay_off_tvoc = (uint16_t)atoi(temp);
                     if(relay_off_tvoc > relay_on_tvoc) relay_off_tvoc = relay_on_tvoc;
+                }
+
+                if(isetdmp == 0  &&  (memcmp(&message[i], "?store_dump=go", 14) == 0  ||
+                                      memcmp(&message[i], "?store_dump=Go", 14) == 0))
+                {
+                    if(nstored > 3)
+                    {
+                        isetdmp = 1;
+                        sprintf(monthday, "%s %02d", month[z_month[i]], z_mday[i]);
+                        sprintf(thisyear, "%d", z_year[i]);
+                        sprintf(message, "%s      C       ppb     ppm\n"
+                                         " %s      Temp    TVOC     CO2   AQI   UVidx\n", monthday, thisyear);
+                        Serial.print(message);
+
+                        for(i=0; i<nstored; i++)
+                        {
+                            sprintf(timenow,  "%0d:%02d:%02d", z_hour[i], z_minute[i], z_second[i]);
+                            sprintf(message, "%s %6.1f %7d %7d %5.0f %7.1f\n",
+                                    timenow, z_temp[i], z_TVOC[i], z_CO2[i], z_AQI[i], z_uvindex[i]);
+                            Serial.print(message);
+                        }
+                        nextSerialTime = 0;
+                        iheader = 99999;
+                        istore  = 0;
+                        nstored = 0;
+                    }
                 }
             }
         }
@@ -461,7 +574,7 @@ void loop()
         else
         {
             strcpy(refbutton, "<br><form>"
-                              "<button style=\"background-color: #8844ff;\" type=\"submit\" "
+                              "<button style=\"background-color:GreenYellow\" type=\"submit\" "
                                        "name=\"manref\" value=\"REF\">REFRESH</button>"
                               "</form>");    // returned to server:  ?manref=REF
         }
@@ -476,7 +589,7 @@ void loop()
                          "<!DOCTYPE html>"
                          "<html style=\"font-family:verdana\">"
                          "<meta name=\"viewport\" content=\"initial-scale=1\">"
-                         "<title>New-EIR UV-C</title>"
+                         "<title>New-EIR UV-C App</title>"
                          "<head>"
                          "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
                          "<link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\" integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">"
@@ -493,13 +606,14 @@ void loop()
                             ".card.temperature { color: #0e7c7b; }"
                             ".card.humidity { color: #17bebb; }"
                             ".card.pressure { color: #4B1D3F; }"
-                            ".card.gas { color: #440088; }"
+                            ".card.gas { color: #d62246; }"
                          "</style>"
                          "</head>"
+                         "<meta http-equiv=\"refresh\" content=\"%d;URL='http://%s/'\">"
                          "<br><br>"
                          "<body>"
                          "<div class=\"topnav\">"
-                         "<h3>New-EIR UV-C Germicidal App</h3>"
+                         "<h3>New-EIR UV-C App</h3>"
                          "</div>"
                          "<div class=\"content\">"
                          "<div class=\"cards\">"
@@ -512,46 +626,17 @@ void loop()
                            "<img src=\"https://docs.google.com/drawings/d/e/2PACX-1vTa5l5IPNuLwZHn7b-yIDdKVXMi40wL0mT7YrQBGJmv7PBa23s-kqaKXxT_WkLeiL65R8BQA4RPw0kq/pub?w=240&amp;h=295\"><br>"
                            "<p style=\"font-size:10px\">Keep this report on display for your customers' assurance of safety, health and comfort. Replace every week.</p><br>"
                          "</div>"
-                         "<meta http-equiv=\"refresh\" content=\"%d\">"
                          "<div class=\"card pressure\">"
                            "<h1>Readings</h1>"
-                             "<table class=\"center\">"
-                               "<tbody><tr>"
-                                 "<th class=\"fas fa-calendar-day\"></th>"
-                                 "<td> %s </td>"
-                                 "<th> %s </th>"
-                               "</tr>"
-                               "<tr>"
-                                 "<td class=\"fas fa-thermometer-half\"></td>"
-                                 "<td> Temperature (20-26 &deg;C)</td>"
-                                 "<td>= %7.2f</td>"
-                               "</tr>"
-                               "<tr>"
-                                 "<td class=\"fas fa-tachometer-alt\"></td>"
-                                 "<td> Pressure (95-101 kPa) </td>"
-                                 "<td>= %7.2f</td>"
-                               "</tr>"
-                               "<tr>"
-                                 "<td class=\"fas fa-tint\"></td>"
-                                 "<td> Humidity (30 - 45 &percnt;) </td>"
-                                 "<td>= %7.2f</td>"
-                               "</tr>"
-                               "<tr>"
-                                 "<td class=\"fas fa-poop\"></td>"
-                                 "<td>TVOC (0 - 500 ppb) </td>"
-                                 "<td>= %7.0f</td>"
-                               "</tr>"
-                               "<tr>"
-                                 "<td class=\"fas fa-dizzy\"></td>"
-                                 "<td> CO2 (400-1000 ppm) </td>"
-                                 "<td>= %7.0f</td>"
-                               "</tr>"
-                             "<tr>"
-                               "<td class=\"fas fa-air-freshener\"></td>"
-                                 "<td> AQI (0 - 50 = Good) </td>"
-                               "<td>= %7.0f</td>"
-                             "</tr>"
-                           "</tbody></table><br>"
+                         "<p>"
+                             "<i class=\"fas fa-calendar-day\"></i> %s  %s<br>"
+                             "<i class=\"fas fa-thermometer-half\"></i> Temperature (&deg;C) = %7.2f<br>"
+                             "<i class=\"fas fa-tachometer-alt\"></i> Pressure (kPa) = %7.2f<br>"
+                             "<i class=\"fas fa-tint\"></i> Humidity (&percnt;)      = %7.1f<br>"
+                             "<i class=\"fas fa-poop\"></i> TVOCs (ppb) = %d<br>"
+                             "<i class=\"fas fa-dizzy\"></i> CO2 (ppm)  = %d<br>"
+                             "<i class=\"fas fa-air-freshener\"></i> AQI        = %7.0f<br>"
+                         "</p>"
                              "<iframe width=\"300\" height=\"260\" seamless frameborder=\"0\" scrolling=\"no\" src=\"https://docs.google.com/spreadsheets/d/e/2PACX-1vR9FhxYm7vf5wwHYgRqjywVEX_XNbWSjp_XNNh6TO3L29nXAS0WXhmC-SytIRtHyu1uat2mJoaybN9d/pubchart?oid=2126194809&amp;format=interactive\"></iframe>"
                              "<iframe width=\"300\" height=\"260\" seamless frameborder=\"0\" scrolling=\"no\" src=\"https://docs.google.com/spreadsheets/d/e/2PACX-1vR9FhxYm7vf5wwHYgRqjywVEX_XNbWSjp_XNNh6TO3L29nXAS0WXhmC-SytIRtHyu1uat2mJoaybN9d/pubchart?oid=350343&amp;format=interactive\"></iframe>"
                          "</div>"
@@ -560,8 +645,15 @@ void loop()
                          "<div>"
                          "<button style=\"background-color: #8844ff;\" onclick=\"window.print()\">Print 30-Day Report</button><br><br>"
                          "</div>"
-                         "<br><br>"
+                         "<br>"
                          "<div style=\"color: #17bebb;\">"
+                         "</p>"
+                             "<i class=\"fas fa-sun\"></i> UVa (&micro;W/&#13216;) = %7.1f<br>"
+                             "<i class=\"fas fa-sun\"></i> UVb (&micro;W/&#13216;) = %7.1f<br>"
+                             "<i class=\"fas fa-sun\"></i> UVindex      = %7.1f<br>"
+                             "<i class=\"fas fa-toggle-on\"></i> Relay  = %s<br>"
+                             "<i class=\"far fa-lightbulb\"></i> bulb on: %d hours<br>"
+                         "</p>"
                          "<form>"
                              "<label for=\"relay\"><i class=\"fas fa-toggle-on\"></i> Relay:  </label>"
                              "<select id=\"relay\" name=\"relay\" onchange=\"this.form.submit()\">"
@@ -570,39 +662,16 @@ void loop()
                                  "<option%s>AUTO</option>"
                              "</select>"
                          "</form>"
-                             "<i class=\"far fa-lightbulb\"></i> bulb on: %d days %d hours %d minutes<br>"
                          "<br>"
-                         "<form>"
-                         "<label for=\"client_refresh\"><i class=\"fas fa-clock\"></i> Seconds between WiFi refresh:</label>"
-                         "<input type=\"text\" id=\"client_refresh\" name=\"client_refresh\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                         "<label for=\"serial_interval\"><i class=\"fas fa-hourglass-half\"></i> Seconds between serial output:</label>"
-                         "<input type=\"text\" id=\"serial_interval\" name=\"serial_interval\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                         "<label for=\"header_interval\"><i class=\"fas fa-list\"></i> Lines between serial output headers:</label>"
-                         "<input type=\"text\" id=\"header_interval\" name=\"header_interval\" size=\"4\" value=\"%d\"><br>"
-                         "</form>"
-                         "<br>"
-                         "<form>"
-                         "<label for=\"zero_bulb\"><i class=\"fas fa-question\"></i> Password to zero bulb time:</label>"
-                         "<input type=\"text\" id=\"zero_bulb\" name=\"zero_bulb\" size=\"4\" value=\"\">"
-                         "</form>"
-                         "<br>"
-                         "%s"
-                         "%s"
-                         "<br>"
+                         "</div>"
                          "</div>"
                          "</div>"
                          "</body>"
-                         "</html>", client_refresh, datenow, timenow,
+                         "</html>", client_refresh, localIP, datenow, timenow,
                                     bme.temperature, press, bme.humidity,
-                                    tvoc_co2.TVOC, tvoc_co2.CO2, AQI, uvindex,
-                                    relON, relOFF, relAUTO, bulbdays, bulbhours, bulbminutes,
-                                    client_refresh, serial_interval, header_interval, relay_control, refbutton);
+                                    tvoc_co2.TVOC, tvoc_co2.CO2, AQI, uva, uvb, uvindex,
+                                    relay_state, bulbhours,
+                                    relON, relOFF, relAUTO, refbutton);
 
         client.println(message);
 
