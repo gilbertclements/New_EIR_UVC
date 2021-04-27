@@ -28,7 +28,7 @@
 #include "time.h"                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
-const char* ssid = "ATT37FMI4R";                                // Replace wifi network id!
+const char* ssid = "AndroidAP";                                // Replace wifi network id!
 const char* pwd  = "password";                                  // Replace wifi password!
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
