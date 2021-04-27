@@ -35,8 +35,8 @@ Dowload IDE @ https://www.arduino.cc/en/software
 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 #include <WiFi.h>                                               // Click here to get the library: http://librarymanager/All#Blynk_Async_ESP32_BT_WF
-const char* ssid = "network";                                // Replace wifi network id!
-const char* pwd  = "password";                              // Replace wifi password!
+const char* ssid = "network";                                   // Replace wifi network id!
+const char* pwd  = "password";                                  // Replace wifi password!
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 
