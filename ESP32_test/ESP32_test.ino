@@ -3,10 +3,13 @@
   Order product:          https://www.sparkfun.com/products/15663
   Hookup Guide:           https://learn.sparkfun.com/tutorials/esp32-thing-plus-hookup-guide
   ESP32-WROOM Datasheet:  https://cdn.sparkfun.com/assets/learn_tutorials/8/5/2/esp32-wroom-32_datasheet_en.pdf
-  
+  ESP32 Pinout            https://cdn.sparkfun.com/r/600-600/assets/learn_tutorials/8/5/2/ESP32ThingPlusV20_GraphicalDatasheet.jpg
+
   Program: ESP32 Test hall sensor, push button PIN_0 and LED PIN_13
     setup complete when flashing stobe
     push button_0 and PIN_13 LED goes off
+  
+  Install Driver          https://cdn.sparkfun.com/assets/learn_tutorials/8/5/2/CP210x_Universal_Windows_Driver.zip
   
   Setup instructions
   File
@@ -29,7 +32,7 @@
 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 const char* ssid = "AndroidAP";                                // Replace wifi network id!
-const char* pwd  = "password";                                  // Replace wifi password!
+const char* pswd = "password";                                  // Replace wifi password!
 WiFiServer server(80);  // port                                 // 
 /////////////////// WiFi ID, pwd, port number. ///////////////////
 
@@ -46,10 +49,10 @@ void setup() {///////////////////////setup////////////////////////////
   
   Serial.print("Connecting to ");  // We start by connecting to a WiFi network
   Serial.print(ssid);
-    WiFi.begin(ssid, password);
+    WiFi.begin(ssid, pswd);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.println(".");
+        Serial.print(".");
     }
     Serial.print("WiFi connected!\nIP address:\t");
     Serial.println(WiFi.localIP());
