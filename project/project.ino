@@ -144,7 +144,7 @@ void setup()
 
     // Connect to Wi-Fi network with SSID and password.
     Serial.print("Connecting to ");
-    Serial.println(ssid);
+    Serial.print(ssid);
     WiFi.begin(ssid, pswd);
     while (WiFi.status() != WL_CONNECTED)
     {
@@ -186,7 +186,6 @@ void setup()
     uvindexmin = 0.015625;  // 1/2^6  This needs to be updated.
 
     // Print local IP address and start web server
-    Serial.println("");
     Serial.println("WiFi connected.");
     strcpy(localIP, WiFi.localIP().toString().c_str());
     Serial.print("Local IP address:  ");
